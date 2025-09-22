@@ -1,15 +1,19 @@
 package com.testautomation.tests.api;
 
 import com.testautomation.api.ApiClient;
+import com.testautomation.builder.UserBuilder;
+import com.testautomation.builder.User;
 import io.qameta.allure.Description;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.restassured.response.Response;
 import org.testng.annotations.Test;
 import static org.hamcrest.Matchers.equalTo;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ApiTests {
     private ApiClient apiClient = new ApiClient();
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     @Description("Test API health check - GitLab CI/CD Pipeline Demo")
@@ -54,23 +58,57 @@ public class ApiTests {
     }
 
     @Test
-    @Description("Test user registration")
+    @Description("Test user registration with Builder pattern")
     @Severity(SeverityLevel.NORMAL)
     public void testUserRegistration() {
-        String userData = "{\"first_name\":\"Test\",\"last_name\":\"User\",\"email\":\"test@example.com\",\"password\":\"password123\"}";
-        Response response = apiClient.post("/auth/register", userData);
-        response.then()
-                .statusCode(201);
+        // Builder Pattern: Create test user data
+        User testUser = new UserBuilder()
+                .setFirstName("Test")
+                .setLastName("User")
+                .setEmail("test@example.com")
+                .setPassword("password123")
+                .build();
+        
+        try {
+            String userData = objectMapper.writeValueAsString(testUser);
+            Response response = apiClient.post("/auth/register", userData);
+            response.then()
+                    .statusCode(201);
+        } catch (Exception e) {
+            // Fallback to manual JSON if ObjectMapper fails
+            String userData = "{\"first_name\":\"" + testUser.getFirstName() + 
+                             "\",\"last_name\":\"" + testUser.getLastName() + 
+                             "\",\"email\":\"" + testUser.getEmail() + 
+                             "\",\"password\":\"" + testUser.getPassword() + "\"}";
+            Response response = apiClient.post("/auth/register", userData);
+            response.then()
+                    .statusCode(201);
+        }
     }
 
     @Test
-    @Description("Test user login")
+    @Description("Test user login with Builder pattern")
     @Severity(SeverityLevel.NORMAL)
     public void testUserLogin() {
-        String loginData = "{\"email\":\"test@example.com\",\"password\":\"password123\"}";
-        Response response = apiClient.post("/auth/login", loginData);
-        response.then()
-                .statusCode(200);
+        // Builder Pattern: Create test user data
+        User testUser = new UserBuilder()
+                .setEmail("test@example.com")
+                .setPassword("password123")
+                .build();
+        
+        try {
+            String loginData = "{\"email\":\"" + testUser.getEmail() + 
+                             "\",\"password\":\"" + testUser.getPassword() + "\"}";
+            Response response = apiClient.post("/auth/login", loginData);
+            response.then()
+                    .statusCode(200);
+        } catch (Exception e) {
+            // Fallback to hardcoded JSON
+            String loginData = "{\"email\":\"test@example.com\",\"password\":\"password123\"}";
+            Response response = apiClient.post("/auth/login", loginData);
+            response.then()
+                    .statusCode(200);
+        }
     }
 
     @Test

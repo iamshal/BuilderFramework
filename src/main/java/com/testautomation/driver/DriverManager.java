@@ -34,9 +34,19 @@ public class DriverManager {
                 System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver");
             } else {
                 System.out.println("🖥️ Local Environment: Using standard Chrome configuration...");
+                // Maximize Chrome window for local execution
+                options.addArguments("--start-maximized");
+                options.addArguments("--disable-extensions");
+                options.addArguments("--disable-popup-blocking");
+                options.addArguments("--disable-notifications");
             }
             
             driver.set(new ChromeDriver(options));
+            
+            // Maximize window after driver creation (fallback)
+            if (!isRunningInCI()) {
+                driver.get().manage().window().maximize();
+            }
         }
         return driver.get();
     }

@@ -4,12 +4,30 @@ import com.testautomation.pages.HomePage;
 import com.testautomation.pages.LoginPage;
 import com.testautomation.pages.ProductPage;
 import com.testautomation.pages.CartPage;
+import com.testautomation.builder.UserBuilder;
+import com.testautomation.builder.User;
+import com.testautomation.driver.DriverManager;
+import com.testautomation.utils.ScreenshotManager;
 import io.qameta.allure.Description;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class UITests {
+
+    @BeforeMethod
+    public void setUp() {
+        // Initialize driver
+        DriverManager.getDriver();
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        ScreenshotManager.takeScreenshot(DriverManager.getDriver(), "UI Test completed");
+        DriverManager.quitDriver();
+    }
 
     @Test
     @Description("Test home page navigation")
@@ -22,15 +40,23 @@ public class UITests {
     }
 
     @Test
-    @Description("Test login functionality")
+    @Description("Test login functionality with Builder pattern")
     @Severity(SeverityLevel.NORMAL)
     public void testLogin() {
+        // Builder Pattern: Create test user data
+        User testUser = new UserBuilder()
+                .setEmail("test@example.com")
+                .setPassword("password")
+                .setFirstName("Test")
+                .setLastName("User")
+                .build();
+        
         HomePage homePage = new HomePage();
         homePage.openHomePage();
         homePage.clickSignIn();
         
         LoginPage loginPage = new LoginPage();
-        loginPage.login("test@example.com", "password");
+        loginPage.login(testUser.getEmail(), testUser.getPassword());
     }
 
     @Test

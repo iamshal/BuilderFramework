@@ -4,6 +4,7 @@ import com.testautomation.driver.DriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.time.Duration;
 
 public abstract class BasePage {
@@ -24,5 +25,13 @@ public abstract class BasePage {
         wait.until(webDriver -> element.isDisplayed() && element.isEnabled());
         element.clear();
         element.sendKeys(text);
+    }
+    
+    protected void waitForElementToBeVisible(WebElement element) {
+        wait.until(ExpectedConditions.visibilityOf(element));
+    }
+    
+    protected void waitForElementToBeClickable(WebElement element) {
+        wait.until(ExpectedConditions.elementToBeClickable(element));
     }
 }

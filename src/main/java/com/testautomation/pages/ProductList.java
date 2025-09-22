@@ -5,6 +5,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import io.qameta.allure.Step;
+import com.testautomation.utils.ScreenshotManager;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +21,7 @@ public class ProductList extends BasePage {
     }
 
     public List<String> getProductNames() {
-        return driver.findElements(By.cssSelector(".card h3"))
+        return driver.findElements(By.cssSelector("[data-test='product-name']"))
                 .stream()
                 .map(WebElement::getText)
                 .collect(Collectors.toList());
@@ -28,11 +29,12 @@ public class ProductList extends BasePage {
 
     @Step("View product details for: {productName}")
     public void viewProductDetails(String productName) {
+        ScreenshotManager.takeScreenshot(driver, "View product details for " + productName);
         WebElement productCard = driver.findElement(By.xpath("//div[contains(@class,'card')]//h3[contains(text(),'" + productName + "')]/.."));
         click(productCard);
     }
 
     public String getSearchCompletedMessage() {
-        return driver.findElement(By.cssSelector(".search-completed")).getText();
+        return driver.findElement(By.cssSelector("[data-test='search_completed']")).getText();
     }
 }

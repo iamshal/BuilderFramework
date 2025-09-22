@@ -42,4 +42,10 @@
             <class name="com.testautomation.tests.shopping.SearchForProductsTest"/>
         </classes>
     </test>
+    
+    <test name="GitLabCICDTests">
+        <classes>
+            <class name="com.testautomation.tests.simple.GitLabCICDTest"/>
+        </classes>
+    </test>
 </suite>

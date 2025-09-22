@@ -1,6 +1,7 @@
 package com.testautomation.tests.shopping;
 
 import com.testautomation.pages.*;
+import com.testautomation.builder.*;
 import com.testautomation.driver.DriverManager;
 import com.testautomation.utils.ScreenshotManager;
 import com.testautomation.tests.fixtures.BaseTest;
@@ -46,10 +47,18 @@ public class AddToCartTest extends BaseTest {
     @Description("Checking out a single item")
     @Severity(SeverityLevel.NORMAL)
     public void whenCheckingOutASingleItem() {
+        // Builder Pattern: Create test product data
+        Product testProduct = new ProductBuilder()
+                .setName("Combination Pliers")
+                .setPrice(29.99)
+                .setCategory("Tools")
+                .setQuantity(3)
+                .build();
+        
         navBar.openHomePage();
         
         searchComponent.searchBy("pliers");
-        productList.viewProductDetails("Combination Pliers");
+        productList.viewProductDetails(testProduct.getName());
 
         productDetails.increaseQuanityBy(2);
         productDetails.addToCart();
@@ -60,8 +69,8 @@ public class AddToCartTest extends BaseTest {
 
         Assert.assertEquals(lineItems.size(), 1);
         CartLineItem item = lineItems.get(0);
-        Assert.assertTrue(item.title().contains("Combination Pliers"));
-        Assert.assertEquals(item.quantity(), 3);
+        Assert.assertTrue(item.title().contains(testProduct.getName()));
+        Assert.assertEquals(item.quantity(), testProduct.getQuantity());
         Assert.assertEquals(item.total(), item.quantity() * item.price(), 0.01);
     }
 
@@ -70,14 +79,29 @@ public class AddToCartTest extends BaseTest {
     @Description("Checking out multiple items")
     @Severity(SeverityLevel.NORMAL)
     public void whenCheckingOutMultipleItems() {
+        // Builder Pattern: Create test product data
+        Product boltCutters = new ProductBuilder()
+                .setName("Bolt Cutters")
+                .setPrice(45.99)
+                .setCategory("Tools")
+                .setQuantity(3)
+                .build();
+                
+        Product slipJointPliers = new ProductBuilder()
+                .setName("Slip Joint Pliers")
+                .setPrice(19.99)
+                .setCategory("Tools")
+                .setQuantity(1)
+                .build();
+        
         navBar.openHomePage();
 
-        productList.viewProductDetails("Bolt Cutters");
+        productList.viewProductDetails(boltCutters.getName());
         productDetails.increaseQuanityBy(2);
         productDetails.addToCart();
 
         navBar.openHomePage();
-        productList.viewProductDetails("Slip Joint Pliers");
+        productList.viewProductDetails(slipJointPliers.getName());
         productDetails.addToCart();
 
         navBar.openCart();
@@ -86,8 +110,8 @@ public class AddToCartTest extends BaseTest {
 
         Assert.assertEquals(lineItems.size(), 2);
         List<String> productNames = lineItems.stream().map(CartLineItem::title).collect(Collectors.toList());
-        Assert.assertTrue(productNames.contains("Bolt Cutters"));
-        Assert.assertTrue(productNames.contains("Slip Joint Pliers"));
+        Assert.assertTrue(productNames.contains(boltCutters.getName()));
+        Assert.assertTrue(productNames.contains(slipJointPliers.getName()));
 
         for (CartLineItem item : lineItems) {
             Assert.assertTrue(item.quantity() >= 1);

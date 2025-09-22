@@ -4,13 +4,14 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.WebElement;
 import io.qameta.allure.Step;
+import com.testautomation.utils.ScreenshotManager;
 
 public class ProductDetails extends BasePage {
 
-    @FindBy(css = "input[name='quantity']")
-    private WebElement quantityInput;
+    @FindBy(css = "button[data-test='increase-quantity']")
+    private WebElement increaseQuantityButton;
 
-    @FindBy(css = "button[type='submit']")
+    @FindBy(css = "button[data-test='add-to-cart']")
     private WebElement addToCartButton;
 
     @FindBy(css = "h1")
@@ -24,15 +25,20 @@ public class ProductDetails extends BasePage {
         PageFactory.initElements(driver, this);
     }
 
-    @Step("Increase quantity by {amount}")
-    public void increaseQuanityBy(int amount) {
-        int currentQuantity = Integer.parseInt(quantityInput.getAttribute("value"));
-        sendKeys(quantityInput, String.valueOf(currentQuantity + amount));
+    @Step("Increase quantity by {increment}")
+    public void increaseQuanityBy(int increment) {
+        for (int i = 1; i <= increment; i++) {
+            waitForElementToBeClickable(increaseQuantityButton);
+            click(increaseQuantityButton);
+        }
+        ScreenshotManager.takeScreenshot(driver, "Quantity increased by " + increment);
     }
 
-    @Step("Add product to cart")
+    @Step("Add to cart")
     public void addToCart() {
+        waitForElementToBeClickable(addToCartButton);
         click(addToCartButton);
+        ScreenshotManager.takeScreenshot(driver, "Added to cart");
     }
 
     public String getProductTitle() {

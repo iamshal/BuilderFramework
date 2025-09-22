@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 
 public class CartPage extends BasePage {
 
-    @FindBy(css = ".cart-item")
-    private List<WebElement> cartItems;
+    @FindBy(css = "app-cart tbody tr")
+    private List<WebElement> cartRows;
 
     @FindBy(css = "a[href*='checkout']")
     private WebElement checkoutButton;
@@ -26,20 +26,29 @@ public class CartPage extends BasePage {
     }
 
     public boolean isItemInCart() {
-        return !cartItems.isEmpty();
+        return !cartRows.isEmpty();
     }
 
     @Step("Get cart line items")
     public List<CartLineItem> getLineItems() {
-        return cartItems.stream()
-                .map(item -> {
-                    String title = item.findElement(By.cssSelector("h3")).getText();
-                    int quantity = Integer.parseInt(item.findElement(By.cssSelector("input[type='number']")).getAttribute("value"));
-                    double price = Double.parseDouble(item.findElement(By.cssSelector(".price")).getText().replace("$", ""));
-                    double total = Double.parseDouble(item.findElement(By.cssSelector(".total")).getText().replace("$", ""));
-                    return new CartLineItem(title, quantity, price, total);
+        waitForElementToBeVisible(cartRows.get(0));
+        return cartRows.stream()
+                .map(row -> {
+                    String title = trimmed(row.findElement(By.cssSelector("[data-test='product-title']")).getText());
+                    int quantity = Integer.parseInt(row.findElement(By.cssSelector("[data-test='product-quantity']")).getAttribute("value"));
+                    double price = Double.parseDouble(price(row.findElement(By.cssSelector("[data-test='product-price']")).getText()));
+                    double linePrice = Double.parseDouble(price(row.findElement(By.cssSelector("[data-test='line-price']")).getText()));
+                    return new CartLineItem(title, quantity, price, linePrice);
                 })
                 .collect(Collectors.toList());
+    }
+
+    private String trimmed(String value) {
+        return value.strip().replaceAll("\u00A0", "");
+    }
+
+    private String price(String value) {
+        return value.replace("$", "");
     }
 
     @Step("Click checkout button")
