@@ -8,6 +8,17 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
   DB_URL: "jdbc:mysql://mysql:3306/testdb"
   KAFKA_BROKER: "kafka:9092"
+
+cache:
+  paths:
+    - .m2/repository/
+
+services:
+  - mysql:8.0
+  - confluentinc/cp-kafka:latest
+  - confluentinc/cp-zookeeper:latest
+
+variables:
   MYSQL_ROOT_PASSWORD: "password"
   MYSQL_DATABASE: "testdb"
   KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
@@ -20,15 +31,6 @@ variables:
   KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT"
   KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
   CLUSTER_ID: "4L6g3nShT-eMCtK--X86sw"
-
-cache:
-  paths:
-    - .m2/repository/
-
-services:
-  - mysql:8.0
-  - confluentinc/cp-kafka:latest
-  - confluentinc/cp-zookeeper:latest
 
 build:
   stage: build
@@ -72,9 +74,17 @@ ui_tests:
   stage: test
   image: openjdk:11-jdk-slim
   before_script:
-    - apt-get update && apt-get install -y maven
+    - apt-get update && apt-get install -y maven wget gnupg unzip
+    - wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add -
+    - echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
+    - apt-get update && apt-get install -y google-chrome-stable
+    - wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip
+    - unzip /tmp/chromedriver.zip -d /usr/local/bin/
+    - chmod +x /usr/local/bin/chromedriver
+    - google-chrome --version
+    - chromedriver --version
   script:
-    - echo "GitLab CI/CD: Running UI tests"
+    - echo "GitLab CI/CD: Running UI tests in headless mode"
     - mvn test -Dtest=UITests
   artifacts:
     when: always
