@@ -12,23 +12,27 @@ public class ApiTests {
     private ApiClient apiClient = new ApiClient();
 
     @Test
-    @Description("Test API health check")
+    @Description("Test API health check - GitLab CI/CD Pipeline Demo")
     @Severity(SeverityLevel.NORMAL)
     public void testApiHealthCheck() {
+        System.out.println("🚀 GitLab CI/CD Pipeline: Starting API health check test...");
         Response response = apiClient.get("/health");
         response.then()
                 .statusCode(200)
                 .body("status", equalTo("OK"));
+        System.out.println("✅ GitLab CI/CD Pipeline: API health check test completed successfully!");
     }
 
     @Test
-    @Description("Test products endpoint")
+    @Description("Test products endpoint - GitLab CI/CD Pipeline Demo")
     @Severity(SeverityLevel.NORMAL)
     public void testGetProducts() {
+        System.out.println("🚀 GitLab CI/CD Pipeline: Starting products endpoint test...");
         Response response = apiClient.get("/products");
         response.then()
                 .statusCode(200)
                 .body("data", equalTo(true));
+        System.out.println("✅ GitLab CI/CD Pipeline: Products endpoint test completed successfully!");
     }
 
     @Test
@@ -86,5 +90,16 @@ public class ApiTests {
         Response response = apiClient.post("/checkout", checkoutData);
         response.then()
                 .statusCode(200);
+    }
+
+    @Test
+    @Description("GitLab CI/CD Pipeline demonstration test")
+    @Severity(SeverityLevel.NORMAL)
+    public void testGitLabCICDPipeline() {
+        System.out.println("🎯 GitLab CI/CD Pipeline: Running demonstration test...");
+        System.out.println("📊 Pipeline Stage: API Tests");
+        System.out.println("🔧 Services: MySQL, Kafka, Zookeeper");
+        System.out.println("📦 Docker: Container orchestration");
+        System.out.println("✅ GitLab CI/CD Pipeline: Demonstration test completed!");
     }
 }
