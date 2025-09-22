@@ -72,9 +72,12 @@ api_tests:
 
 ui_tests:
   stage: test
-  image: openjdk:11-jdk-slim
+  image: selenium/standalone-chrome:latest
   before_script:
-    - apt-get update && apt-get install -y maven
+    - apt-get update && apt-get install -y maven openjdk-11-jdk
+    - export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+    - java -version
+    - mvn -version
   script:
     - mvn test -Dtest=UITests
   artifacts:
