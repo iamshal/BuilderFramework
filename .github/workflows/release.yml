@@ -1,0 +1,42 @@
+name: Release and Deploy
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 11
+      uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+    
+    - name: Build and Test
+      run: mvn clean package
+    
+    - name: Build Docker Image
+      run: docker build -t epam-test-framework:${{ github.ref_name }} .
+    
+    - name: Push to Docker Hub
+      if: github.event_name == 'push'
+      run: |
+        echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+        docker tag epam-test-framework:${{ github.ref_name }} ${{ secrets.DOCKER_USERNAME }}/epam-test-framework:${{ github.ref_name }}
+        docker push ${{ secrets.DOCKER_USERNAME }}/epam-test-framework:${{ github.ref_name }}
+    
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false

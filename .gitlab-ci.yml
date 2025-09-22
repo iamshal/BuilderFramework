@@ -1,0 +1,38 @@
+stages:
+  - test
+  - report
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+cache:
+  paths:
+    - .m2/repository/
+
+test:
+  stage: test
+  image: openjdk:11-jdk-slim
+  before_script:
+    - apt-get update && apt-get install -y maven
+  script:
+    - mvn clean test
+  artifacts:
+    when: always
+    paths:
+      - target/allure-results/
+      - test-output/
+    expire_in: 1 week
+
+generate_report:
+  stage: report
+  image: openjdk:11-jdk-slim
+  before_script:
+    - apt-get update && apt-get install -y maven
+  script:
+    - mvn allure:report
+  artifacts:
+    paths:
+      - target/site/allure-maven-plugin/
+    expire_in: 1 month
+  only:
+    - main

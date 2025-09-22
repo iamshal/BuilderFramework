@@ -1,0 +1,35 @@
+name: Docker Compose CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  docker-compose-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Start Services with Docker Compose
+      run: |
+        docker-compose up -d mysql zookeeper kafka
+        sleep 30  # Wait for services to be ready
+    
+    - name: Run Tests
+      run: |
+        docker-compose run --rm test-framework mvn test -Dtest=SimpleTests
+        docker-compose run --rm test-framework mvn test -Dtest=ApiTests
+    
+    - name: Stop Services
+      if: always()
+      run: docker-compose down
+    
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: docker-test-results
+        path: target/surefire-reports/

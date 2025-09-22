@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="TestSuite">
+    <test name="UITests">
+        <classes>
+            <class name="com.testautomation.tests.ui.UITests"/>
+        </classes>
+    </test>
+    
+    <test name="ApiTests">
+        <classes>
+            <class name="com.testautomation.tests.api.ApiTests"/>
+        </classes>
+    </test>
+    
+    <test name="KafkaTests">
+        <classes>
+            <class name="com.testautomation.tests.kafka.KafkaTests"/>
+        </classes>
+    </test>
+    
+    <test name="DatabaseTests">
+        <classes>
+            <class name="com.testautomation.tests.database.DatabaseTests"/>
+        </classes>
+    </test>
+    
+    <test name="MockingTests">
+        <classes>
+            <class name="com.testautomation.tests.mocking.MockingTests"/>
+        </classes>
+    </test>
+    
+    <test name="IntegrationTests">
+        <classes>
+            <class name="com.testautomation.tests.integration.IntegrationTests"/>
+        </classes>
+    </test>
+    
+    <test name="ShoppingTests">
+        <classes>
+            <class name="com.testautomation.tests.shopping.AddToCartTest"/>
+            <class name="com.testautomation.tests.shopping.SearchForProductsTest"/>
+        </classes>
+    </test>
+</suite>
