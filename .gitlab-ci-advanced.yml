@@ -1,13 +1,17 @@
+# Advanced GitLab CI/CD Pipeline
 stages:
   - build
   - test
+  - security
   - report
   - deploy
+  - cleanup
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
   DB_URL: "jdbc:mysql://mysql:3306/testdb"
   KAFKA_BROKER: "kafka:9092"
+  DOCKER_DRIVER: overlay2
 
 cache:
   paths:
@@ -32,6 +36,7 @@ variables:
   KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
   CLUSTER_ID: "4L6g3nShT-eMCtK--X86sw"
 
+# Build Stage
 build:
   stage: build
   image: openjdk:11-jdk-slim
@@ -44,6 +49,7 @@ build:
       - target/classes/
     expire_in: 1 hour
 
+# Test Stages
 unit_tests:
   stage: test
   image: openjdk:11-jdk-slim
@@ -109,6 +115,21 @@ database_tests:
       - target/surefire-reports/
     expire_in: 1 week
 
+# Security Stage
+security_scan:
+  stage: security
+  image: openjdk:11-jdk-slim
+  before_script:
+    - apt-get update && apt-get install -y maven
+  script:
+    - mvn org.owasp:dependency-check-maven:check
+  artifacts:
+    paths:
+      - target/dependency-check-report.html
+    expire_in: 1 week
+  allow_failure: true
+
+# Report Generation
 generate_report:
   stage: report
   image: openjdk:11-jdk-slim
@@ -123,6 +144,7 @@ generate_report:
   only:
     - main
 
+# Docker Build and Deploy
 docker_build:
   stage: deploy
   image: docker:latest
@@ -136,6 +158,7 @@ docker_build:
   only:
     - main
 
+# Docker Compose Integration Test
 docker_compose_test:
   stage: test
   image: docker:latest
@@ -151,3 +174,15 @@ docker_compose_test:
     paths:
       - target/surefire-reports/
     expire_in: 1 week
+
+# Cleanup
+cleanup:
+  stage: cleanup
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker system prune -f
+  when: always
+  only:
+    - main
