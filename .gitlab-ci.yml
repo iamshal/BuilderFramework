@@ -82,7 +82,7 @@ ui_tests:
     - google-chrome --version
     - chromedriver --version
   script:
-    - echo "🚀 GitLab CI/CD: Running UI tests in headless mode..."
+    - echo "GitLab CI/CD: Running UI tests in headless mode"
     - mvn test -Dtest=UITests
   artifacts:
     when: always
