@@ -8,17 +8,6 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
   DB_URL: "jdbc:mysql://mysql:3306/testdb"
   KAFKA_BROKER: "kafka:9092"
-
-cache:
-  paths:
-    - .m2/repository/
-
-services:
-  - mysql:8.0
-  - confluentinc/cp-kafka:latest
-  - confluentinc/cp-zookeeper:latest
-
-variables:
   MYSQL_ROOT_PASSWORD: "password"
   MYSQL_DATABASE: "testdb"
   KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
@@ -31,6 +20,15 @@ variables:
   KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT"
   KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
   CLUSTER_ID: "4L6g3nShT-eMCtK--X86sw"
+
+cache:
+  paths:
+    - .m2/repository/
+
+services:
+  - mysql:8.0
+  - confluentinc/cp-kafka:latest
+  - confluentinc/cp-zookeeper:latest
 
 build:
   stage: build
