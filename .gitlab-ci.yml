@@ -1,11 +1,9 @@
 stages:
   - build
   - test
-  - report
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
-  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
 
 cache:
   paths:
@@ -17,75 +15,12 @@ build:
   before_script:
     - apt-get update && apt-get install -y maven
   script:
-    - echo "🚀 GitLab CI/CD: Building test automation framework..."
     - mvn clean compile
-    - echo "✅ GitLab CI/CD: Build completed successfully!"
-  artifacts:
-    paths:
-      - target/classes/
-    expire_in: 1 hour
 
-simple_tests:
+test:
   stage: test
   image: openjdk:11-jdk-slim
   before_script:
     - apt-get update && apt-get install -y maven
   script:
-    - echo "🚀 GitLab CI/CD: Running simple tests..."
     - mvn test -Dtest=GitLabCICDTest
-    - echo "✅ GitLab CI/CD: Simple tests completed!"
-  artifacts:
-    when: always
-    paths:
-      - target/surefire-reports/
-    expire_in: 1 week
-
-unit_tests:
-  stage: test
-  image: openjdk:11-jdk-slim
-  before_script:
-    - apt-get update && apt-get install -y maven
-  script:
-    - echo "🚀 GitLab CI/CD: Running unit tests..."
-    - mvn test -Dtest=SimpleTests
-    - echo "✅ GitLab CI/CD: Unit tests completed!"
-  artifacts:
-    when: always
-    paths:
-      - target/surefire-reports/
-    expire_in: 1 week
-
-api_tests:
-  stage: test
-  image: openjdk:11-jdk-slim
-  before_script:
-    - apt-get update && apt-get install -y maven
-  script:
-    - echo "🚀 GitLab CI/CD: Running API tests..."
-    - mvn test -Dtest=ApiTests
-    - echo "✅ GitLab CI/CD: API tests completed!"
-  artifacts:
-    when: always
-    paths:
-      - target/surefire-reports/
-    expire_in: 1 week
-
-report:
-  stage: report
-  image: openjdk:11-jdk-slim
-  before_script:
-    - apt-get update && apt-get install -y maven
-  script:
-    - echo "📊 GitLab CI/CD: Generating test reports..."
-    - mvn allure:report
-    - echo "✅ GitLab CI/CD: Reports generated successfully!"
-  artifacts:
-    when: always
-    paths:
-      - target/allure-results/
-      - target/site/allure-maven-plugin/
-    expire_in: 1 week
-  dependencies:
-    - simple_tests
-    - unit_tests
-    - api_tests
