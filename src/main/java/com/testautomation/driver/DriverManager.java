@@ -31,7 +31,7 @@ public class DriverManager {
                 options.addArguments("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36");
                 
                 // Use system Chrome binary
-                System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
+                System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver");
             } else {
                 System.out.println("🖥️ Local Environment: Using standard Chrome configuration...");
             }
