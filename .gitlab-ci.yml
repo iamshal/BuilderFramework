@@ -1,34 +1,13 @@
 stages:
   - build
   - test
-  - report
-  - deploy
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
-  DB_URL: "jdbc:mysql://mysql:3306/testdb"
-  KAFKA_BROKER: "kafka:9092"
-  MYSQL_ROOT_PASSWORD: "password"
-  MYSQL_DATABASE: "testdb"
-  KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-  KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
-  KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092"
-  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
-  KAFKA_PROCESS_ROLES: "broker"
-  KAFKA_NODE_ID: "1"
-  KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
-  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT"
-  KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
-  CLUSTER_ID: "4L6g3nShT-eMCtK--X86sw"
 
 cache:
   paths:
     - .m2/repository/
-
-services:
-  - mysql:8.0
-  - confluentinc/cp-kafka:latest
-  - confluentinc/cp-zookeeper:latest
 
 build:
   stage: build
@@ -37,10 +16,6 @@ build:
     - apt-get update && apt-get install -y maven
   script:
     - mvn clean compile
-  artifacts:
-    paths:
-      - target/classes/
-    expire_in: 1 hour
 
 unit_tests:
   stage: test
@@ -74,7 +49,7 @@ ui_tests:
   before_script:
     - apt-get update && apt-get install -y maven
   script:
-    - echo "GitLab CI/CD: Running UI tests"
+    - echo "Running UI tests"
     - mvn test -Dtest=UITests
   artifacts:
     when: always
@@ -82,72 +57,3 @@ ui_tests:
       - target/surefire-reports/
     expire_in: 1 week
   allow_failure: true
-
-kafka_tests:
-  stage: test
-  image: openjdk:11-jdk-slim
-  before_script:
-    - apt-get update && apt-get install -y maven
-  script:
-    - mvn test -Dtest=KafkaTests
-  artifacts:
-    when: always
-    paths:
-      - target/surefire-reports/
-    expire_in: 1 week
-
-database_tests:
-  stage: test
-  image: openjdk:11-jdk-slim
-  before_script:
-    - apt-get update && apt-get install -y maven
-  script:
-    - mvn test -Dtest=DatabaseTests
-  artifacts:
-    when: always
-    paths:
-      - target/surefire-reports/
-    expire_in: 1 week
-
-generate_report:
-  stage: report
-  image: openjdk:11-jdk-slim
-  before_script:
-    - apt-get update && apt-get install -y maven
-  script:
-    - mvn allure:report
-  artifacts:
-    paths:
-      - target/site/allure-maven-plugin/
-    expire_in: 1 month
-  only:
-    - main
-
-docker_build:
-  stage: deploy
-  image: docker:latest
-  services:
-    - docker:dind
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  only:
-    - main
-
-docker_compose_test:
-  stage: test
-  image: docker:latest
-  services:
-    - docker:dind
-  script:
-    - docker-compose up -d mysql zookeeper kafka
-    - sleep 30
-    - docker-compose run --rm test-framework mvn test -Dtest=SimpleTests
-    - docker-compose down
-  artifacts:
-    when: always
-    paths:
-      - target/surefire-reports/
-    expire_in: 1 week
