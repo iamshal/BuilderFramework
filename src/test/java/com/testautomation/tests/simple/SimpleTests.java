@@ -8,20 +8,22 @@ import org.testng.annotations.Test;
 public class SimpleTests {
 
     @Test
-    @Description("Simple test without external dependencies")
+    @Description("Simple test without external dependencies - CI/CD Demo")
     @Severity(SeverityLevel.NORMAL)
     public void testSimpleCalculation() {
         int result = 2 + 2;
         assert result == 4;
+        System.out.println("✅ GitLab CI/CD Pipeline Test - Simple calculation passed!");
     }
 
     @Test
-    @Description("Test string operations")
+    @Description("Test string operations - CI/CD Demo")
     @Severity(SeverityLevel.NORMAL)
     public void testStringOperations() {
         String testString = "Hello World";
         assert testString.length() == 11;
         assert testString.contains("World");
+        System.out.println("✅ GitLab CI/CD Pipeline Test - String operations passed!");
     }
 
     @Test
