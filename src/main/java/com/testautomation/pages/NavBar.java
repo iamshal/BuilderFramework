@@ -38,4 +38,10 @@ public class NavBar extends BasePage {
         driver.get(Config.BASE_URL + "/contact");
         ScreenshotManager.takeScreenshot(driver, "Contact page");
     }
+    
+    @Step("Open categories page")
+    public void openCategoriesPage() {
+        driver.get(Config.BASE_URL + "/categories");
+        ScreenshotManager.takeScreenshot(driver, "Categories page");
+    }
 }

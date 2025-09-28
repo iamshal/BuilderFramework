@@ -12,11 +12,18 @@
         </classes>
     </test>
     
-    <test name="KafkaTests">
-        <classes>
-            <class name="com.testautomation.tests.kafka.KafkaTests"/>
-        </classes>
-    </test>
+            <test name="KafkaTests">
+                <classes>
+                    <class name="com.testautomation.tests.kafka.KafkaTests"/>
+                    <class name="com.testautomation.tests.kafka.DataFetchingTest"/>
+                </classes>
+            </test>
+            
+            <test name="BankingTests">
+                <classes>
+                    <class name="com.testautomation.tests.banking.BankingDataManagementTest"/>
+                </classes>
+            </test>
     
     <test name="DatabaseTests">
         <classes>
@@ -46,6 +53,18 @@
     <test name="GitLabCICDTests">
         <classes>
             <class name="com.testautomation.tests.simple.GitLabCICDTest"/>
+        </classes>
+    </test>
+    
+    <test name="EndToEndTests">
+        <classes>
+            <class name="com.testautomation.tests.e2e.SimplifiedE2ETest"/>
+        </classes>
+    </test>
+    
+    <test name="NavigationTests">
+        <classes>
+            <class name="com.testautomation.tests.navigation.NavigationTest"/>
         </classes>
     </test>
 </suite>

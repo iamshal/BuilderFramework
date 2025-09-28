@@ -7,13 +7,13 @@ import io.qameta.allure.Step;
 
 public class SearchComponent extends BasePage {
 
-    @FindBy(css = "input[placeholder*='Search']")
+    @FindBy(css = "input[placeholder*='Search'], input[type='search'], input[name='search']")
     private WebElement searchInput;
 
-    @FindBy(css = "button[data-test='search-submit']")
+    @FindBy(css = "button[type='submit'], button[data-test='search-submit'], .search-button")
     private WebElement searchButton;
     
-    @FindBy(css = "button[data-test='search-reset']")
+    @FindBy(css = "button[data-test='search-reset'], .clear-search")
     private WebElement clearSearchButton;
 
     public SearchComponent() {

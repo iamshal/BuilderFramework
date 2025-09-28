@@ -21,7 +21,7 @@ public class ProductList extends BasePage {
     }
 
     public List<String> getProductNames() {
-        return driver.findElements(By.cssSelector("[data-test='product-name']"))
+        return driver.findElements(By.cssSelector("[data-test='product-name'], .product-name, h3, .card-title"))
                 .stream()
                 .map(WebElement::getText)
                 .collect(Collectors.toList());
@@ -30,8 +30,15 @@ public class ProductList extends BasePage {
     @Step("View product details for: {productName}")
     public void viewProductDetails(String productName) {
         ScreenshotManager.takeScreenshot(driver, "View product details for " + productName);
-        WebElement productCard = driver.findElement(By.xpath("//div[contains(@class,'card')]//h3[contains(text(),'" + productName + "')]/.."));
-        click(productCard);
+        // Try multiple selectors for product cards
+        try {
+            WebElement productCard = driver.findElement(By.xpath("//div[contains(@class,'card')]//h3[contains(text(),'" + productName + "')]/.."));
+            click(productCard);
+        } catch (Exception e) {
+            // Fallback: click on any element containing the product name
+            WebElement productElement = driver.findElement(By.xpath("//*[contains(text(),'" + productName + "')]"));
+            click(productElement);
+        }
     }
 
     public String getSearchCompletedMessage() {
